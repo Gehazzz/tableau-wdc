@@ -1,18 +1,33 @@
 package com.proteantec.tableauwdc.controller;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Map;
 
+@Slf4j
 @RestController
 public class TableauWebConnectorController {
     @Autowired
     private JdbcTemplate jdbcTemplate;
 
+    @PostMapping("/analysis")
+    public String analysis(@RequestHeader Map<String, String> headers, @RequestBody String data){
+        //log.info(headers.toString());
+        log.info(data);
+        return data;
+    }
+/*
+* getCatalogs
+* getSchemas
+* getTableTypes
+* getTables
+* https://docs.microsoft.com/en-us/sql/connect/jdbc/modifying-result-set-data-sample?view=sql-server-ver15
+* */
     @GetMapping("/v1/query")
     public ResultSet query() throws SQLException {
        /* jdbcTemplate.queryForObject(
