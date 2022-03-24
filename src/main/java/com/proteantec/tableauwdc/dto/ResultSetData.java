@@ -1,13 +1,14 @@
 package com.proteantec.tableauwdc.dto;
 
-import lombok.Builder;
-import lombok.Data;
+import lombok.*;
 
 import java.util.List;
 import java.util.Map;
 
 @Data
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class ResultSetData {
     private int columnCount;
     private String schemaName;

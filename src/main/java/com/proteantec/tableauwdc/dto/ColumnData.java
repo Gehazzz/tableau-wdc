@@ -1,10 +1,11 @@
 package com.proteantec.tableauwdc.dto;
 
-import lombok.Builder;
-import lombok.Data;
+import lombok.*;
 
 @Data
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class ColumnData {
     private int index;
     private boolean isAutoIncrement;

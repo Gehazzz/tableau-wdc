@@ -1,33 +1,44 @@
 package com.proteantec.tableauwdc.controller;
 
+import com.proteantec.tableauwdc.dto.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.web.bind.annotation.*;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Arrays;
 import java.util.Map;
 
 @Slf4j
 @RestController
+@RequestMapping("/v1")
 public class TableauWebConnectorController {
     @Autowired
     private JdbcTemplate jdbcTemplate;
 
-    @PostMapping("/analysis")
-    public String analysis(@RequestHeader Map<String, String> headers, @RequestBody String data){
-        //log.info(headers.toString());
-        log.info(data);
-        return data;
+    @PostMapping(value = "/columns")
+    public ColumnsToHide analysis(@RequestHeader Map<String, String> headers, @RequestBody ResultSetData data, @RequestParam("action") Action action) {
+        log.info("{}", action);
+        log.info("{}", data);
+        return ColumnsToHide.builder().hiddenColumns(Arrays.asList("foo", "bar")).build();
     }
-/*
-* getCatalogs
-* getSchemas
-* getTableTypes
-* getTables
-* https://docs.microsoft.com/en-us/sql/connect/jdbc/modifying-result-set-data-sample?view=sql-server-ver15
-* */
+
+    /*   @PostMapping("/analysis")
+       public String analysis(@RequestHeader Map<String, String> headers, @RequestBody String data){
+           //log.info(headers.toString());
+           log.info(data);
+           return data;
+       }*/
+    /*
+     * getCatalogs
+     * getSchemas
+     * getTableTypes
+     * getTables
+     * https://docs.microsoft.com/en-us/sql/connect/jdbc/modifying-result-set-data-sample?view=sql-server-ver15
+     * */
     @GetMapping("/v1/query")
     public ResultSet query() throws SQLException {
        /* jdbcTemplate.queryForObject(
