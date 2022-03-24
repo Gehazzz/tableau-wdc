@@ -15,8 +15,4 @@ public class ResultSetData {
     private String tableName;
     private String interceptionPoint;
     private List<RowData> rowsData;
-    private Map<String, String> schemas;
-    private Map<String, String> tableTypes;
-    private Map<String, String> tables;
-    private Map<String, String> columns;
 }

@@ -1,37 +1,70 @@
 package com.proteantec.tableauwdc.controller;
 
 import com.proteantec.tableauwdc.dto.*;
+import com.proteantec.tableauwdc.model.Column;
+import com.proteantec.tableauwdc.service.ColumnsService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.MediaType;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.web.bind.annotation.*;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Slf4j
 @RestController
 @RequestMapping("/v1")
 public class TableauWebConnectorController {
-    @Autowired
-    private JdbcTemplate jdbcTemplate;
 
-    @PostMapping(value = "/columns")
-    public ColumnsToHide analysis(@RequestHeader Map<String, String> headers, @RequestBody ResultSetData data, @RequestParam("action") Action action) {
-        log.info("{}", action);
-        log.info("{}", data);
-        return ColumnsToHide.builder().hiddenColumns(Arrays.asList("foo", "bar")).build();
+    private final JdbcTemplate jdbcTemplate;
+
+    private final Map<String, ColumnsService> columnsServices;
+
+    @Autowired
+    public TableauWebConnectorController(JdbcTemplate jdbcTemplate, Set<ColumnsService> columnsServices) {
+        this.jdbcTemplate = jdbcTemplate;
+        this.columnsServices = columnsServices.stream().collect(Collectors.toMap(ColumnsService::db, Function.identity()));
     }
 
-    /*   @PostMapping("/analysis")
-       public String analysis(@RequestHeader Map<String, String> headers, @RequestBody String data){
-           //log.info(headers.toString());
-           log.info(data);
-           return data;
-       }*/
+    @PostMapping(value = "/tables/{db}")
+    public TablesToHide tables(@RequestHeader Map<String, String> headers, @RequestBody ResultSetData data, @RequestParam("action") Action action) {
+        //if(action.equals(Action.HIDE))
+        log.info("{}", action);
+        log.info("{}", data);
+        return TablesToHide.builder().hiddenTables(Arrays.asList("failedpn")).build();
+    }
+
+    @PostMapping(value = "/columns/{db}")
+    public ColumnsToHide columns(@RequestHeader Map<String, String> headers, @RequestBody ResultSetData data, @PathVariable("db") String db, @RequestParam("action") Action action) {
+        //TODO: Check if the metaData.getColumns returns the same resultSet structure for all databases
+        List<Column> columns = columnsServices.get(db).extractColumns(data);
+        //if(action.equals(Action.HIDE))
+        log.info("{}", columns);
+        log.info("{}", action);
+        log.info("{}", data);
+        return ColumnsToHide.builder().hiddenColumns(Arrays.asList("device_token")).build();
+    }
+
+    @PostMapping("/log")
+    public String log(@RequestBody LogMessage logMessage) {
+        //log.info(headers.toString());
+        log.info("Interception point: {}, Message: {}", logMessage.getExecutionPoint(), logMessage.getMessage());
+        return log.toString();
+    }
+
+    @PostMapping("/analysis")
+    public String analysis(@RequestHeader Map<String, String> headers, @RequestBody String data) {
+        //log.info(headers.toString());
+        log.info(data);
+        return data;
+    }
+
     /*
      * getCatalogs
      * getSchemas
