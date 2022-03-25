@@ -10,10 +10,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -38,6 +35,7 @@ public class TableauWebConnectorController {
         log.info("{}", action);
         log.info("{}", data);
         return TablesToHide.builder().hiddenTables(Arrays.asList("failedpn")).build();
+        //return TablesToHide.builder().hiddenTables(Collections.emptyList()).build();
     }
 
     @PostMapping(value = "/columns/{db}")
@@ -54,8 +52,21 @@ public class TableauWebConnectorController {
     @PostMapping("/log")
     public String log(@RequestBody LogMessage logMessage) {
         //log.info(headers.toString());
-        log.info("Interception point: {}, Message: {}", logMessage.getExecutionPoint(), logMessage.getMessage());
+        log.info("Interception point: {}, Message: {}", logMessage.getInterceptionPoint(), logMessage.getMessage());
         return log.toString();
+    }
+
+    @PostMapping("/approve")
+    public QueryApprovalResponse approve(@RequestBody QueryRequestForApproval queryRequestForApproval) {
+        //log.info(headers.toString());
+        log.info("Interception point: {}, Received approval request for query: {}", queryRequestForApproval.getInterceptionPoint(), queryRequestForApproval.getQuery());
+        boolean isApproved = !queryRequestForApproval.getQuery().contains("select * from failedpn");
+        log.warn(String.valueOf(isApproved));
+        return  QueryApprovalResponse.builder()
+                .isApproved(isApproved)
+                .query(queryRequestForApproval.getQuery())
+                .message("Query execution denied")
+                .build();
     }
 
     @PostMapping("/analysis")

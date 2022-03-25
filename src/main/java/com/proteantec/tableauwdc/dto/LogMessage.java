@@ -11,5 +11,5 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class LogMessage {
     private String message;
-    private String executionPoint;
+    private String interceptionPoint;
 }
