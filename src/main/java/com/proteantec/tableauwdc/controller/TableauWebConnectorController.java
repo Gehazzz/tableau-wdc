@@ -34,8 +34,8 @@ public class TableauWebConnectorController {
         //if(action.equals(Action.HIDE))
         log.info("{}", action);
         log.info("{}", data);
-        return TablesToHide.builder().hiddenTables(Arrays.asList("failedpn")).build();
-        //return TablesToHide.builder().hiddenTables(Collections.emptyList()).build();
+        //return TablesToHide.builder().hiddenTables(Arrays.asList("failedpn")).build();
+        return TablesToHide.builder().hiddenTables(Collections.emptyList()).build();
     }
 
     @PostMapping(value = "/columns/{db}")
@@ -60,7 +60,7 @@ public class TableauWebConnectorController {
     public QueryApprovalResponse approve(@RequestBody QueryRequestForApproval queryRequestForApproval) {
         //log.info(headers.toString());
         log.info("Interception point: {}, Received approval request for query: {}", queryRequestForApproval.getInterceptionPoint(), queryRequestForApproval.getQuery());
-        boolean isApproved = !queryRequestForApproval.getQuery().contains("select * from failedpn");
+        boolean isApproved = !queryRequestForApproval.getQuery().contains("select * from bi_pipeline.failedpn");
         log.warn(String.valueOf(isApproved));
         return  QueryApprovalResponse.builder()
                 .isApproved(isApproved)
@@ -83,10 +83,10 @@ public class TableauWebConnectorController {
      * getTables
      * https://docs.microsoft.com/en-us/sql/connect/jdbc/modifying-result-set-data-sample?view=sql-server-ver15
      * */
-    @GetMapping("/v1/query")
+/*    @GetMapping("/v1/query")
     public ResultSet query() throws SQLException {
-       /* jdbcTemplate.queryForObject(
-                "SELECT * FROM bi_pipeline.failedpn", Integer.class);*/
+       *//* jdbcTemplate.queryForObject(
+                "SELECT * FROM bi_pipeline.failedpn", Integer.class);*//*
         jdbcTemplate.getDataSource().getConnection().createStatement().execute("CREATE schema bi_pipeline;\n" +
                 "\n" +
                 "CREATE TABLE bi_pipeline.failedpn\n" +
@@ -109,6 +109,5 @@ public class TableauWebConnectorController {
         ResultSet result = jdbcTemplate.getDataSource().getConnection().createStatement().executeQuery(
                 "SELECT * FROM bi_pipeline.failedpn;");
         return result;
-    }
-
+    }*/
 }
