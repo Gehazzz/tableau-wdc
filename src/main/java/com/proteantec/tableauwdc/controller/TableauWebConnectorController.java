@@ -3,13 +3,12 @@ package com.proteantec.tableauwdc.controller;
 import com.proteantec.tableauwdc.dto.*;
 import com.proteantec.tableauwdc.model.Column;
 import com.proteantec.tableauwdc.service.ColumnsService;
+import com.proteantec.tableauwdc.service.QueryValidationServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.web.bind.annotation.*;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -22,11 +21,13 @@ public class TableauWebConnectorController {
     private final JdbcTemplate jdbcTemplate;
 
     private final Map<String, ColumnsService> columnsServices;
+    private final QueryValidationServiceImpl queryValidationService;
 
     @Autowired
-    public TableauWebConnectorController(JdbcTemplate jdbcTemplate, Set<ColumnsService> columnsServices) {
+    public TableauWebConnectorController(JdbcTemplate jdbcTemplate, Set<ColumnsService> columnsServices, QueryValidationServiceImpl queryValidationService) {
         this.jdbcTemplate = jdbcTemplate;
         this.columnsServices = columnsServices.stream().collect(Collectors.toMap(ColumnsService::db, Function.identity()));
+        this.queryValidationService = queryValidationService;
     }
 
     @PostMapping(value = "/tables/{db}")
@@ -60,13 +61,15 @@ public class TableauWebConnectorController {
     public QueryApprovalResponse approve(@RequestBody QueryRequestForApproval queryRequestForApproval) {
         //log.info(headers.toString());
         log.info("Interception point: {}, Received approval request for query: {}", queryRequestForApproval.getInterceptionPoint(), queryRequestForApproval.getQuery());
-        boolean isApproved = !queryRequestForApproval.getQuery().contains("select * from bi_pipeline.failedpn");
-        log.warn(String.valueOf(isApproved));
-        return  QueryApprovalResponse.builder()
-                .isApproved(isApproved)
-                .query(queryRequestForApproval.getQuery())
-                .message("Query execution denied")
-                .build();
+        return queryValidationService.validate(queryRequestForApproval);
+//        boolean isApproved = !queryRequestForApproval.getQuery().contains("select * from bi_pipeline.failedpn");
+//        boolean isApproved = !queryRequestForApproval.getQuery().contains("231");
+//        log.warn(String.valueOf(isApproved));
+//        return  QueryApprovalResponse.builder()
+//                .isApproved(isApproved)
+//                .query(queryRequestForApproval.getQuery())
+//                .message("Query execution denied")
+//                .build();
     }
 
     @PostMapping("/analysis")
